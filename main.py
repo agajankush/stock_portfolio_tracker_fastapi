@@ -1,4 +1,7 @@
+# main.py
+
 from fastapi import FastAPI
+# Corrected import without the dot
 from routers import users, portfolios
 
 app = FastAPI(
@@ -12,4 +15,4 @@ app.include_router(portfolios.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the Stock Portfolio API"}
+    return {"message": "Welcome to the Stock Portfolio API!"}
