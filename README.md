@@ -58,7 +58,7 @@ A modern, fast, and secure FastAPI-based REST API for managing stock portfolios 
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/agajankush/stock_portfolio_tracker_fastapi
 cd stock_portfolio_tracker_fastapi
 ```
 
