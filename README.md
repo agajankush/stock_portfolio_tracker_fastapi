@@ -26,7 +26,7 @@ A modern, fast, and secure FastAPI-based REST API for managing stock portfolios 
 - **Database Integration**
 
   - PostgreSQL database with SQLAlchemy ORM
-  - Alembic database migrations
+  - Docker-based PostgreSQL and Redis setup
   - Optimized queries and relationships
 
 - **Security**
@@ -42,15 +42,14 @@ A modern, fast, and secure FastAPI-based REST API for managing stock portfolios 
 - **Authentication**: JWT with OAuth2
 - **Password Hashing**: Argon2 (via Passlib)
 - **Caching**: Redis
-- **Migrations**: Alembic
+- **Containerization**: Docker
 - **Validation**: Pydantic v2
 - **Python**: 3.13+
 
 ## 📋 Prerequisites
 
 - Python 3.13 or higher
-- PostgreSQL database
-- Redis server
+- Docker and Docker Compose
 - UV package manager (recommended) or pip
 
 ## 🚀 Quick Start
@@ -76,15 +75,22 @@ Or using pip:
 pip install -r requirements.txt
 ```
 
-### 3. Environment Setup
+### 3. Start Docker Services
+
+```bash
+# Start PostgreSQL and Redis using Docker Compose
+docker-compose up -d
+```
+
+### 4. Environment Setup
 
 Create a `.env` file in the root directory:
 
 ```env
-# Database Configuration
-DATABASE_URL=postgresql://username:password@localhost:5432/stock_portfolio_db
+# Database Configuration (Docker PostgreSQL)
+DATABASE_URL=postgresql://postgres:password@localhost:5432/stock_portfolio_db
 
-# Redis Configuration
+# Redis Configuration (Docker Redis)
 REDIS_URL=redis://localhost:6379/0
 
 # JWT Configuration
@@ -95,13 +101,6 @@ JWT_EXPIRATION_TIME=30
 # API Configuration
 API_HOST=0.0.0.0
 API_PORT=8000
-```
-
-### 4. Database Setup
-
-```bash
-# Run database migrations
-alembic upgrade head
 ```
 
 ### 5. Start the Application
@@ -119,6 +118,43 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - **API Documentation**: http://localhost:8000/docs
 - **ReDoc Documentation**: http://localhost:8000/redoc
 - **API Base URL**: http://localhost:8000
+
+## 🐳 Docker Setup
+
+The project uses Docker for PostgreSQL and Redis services. Create a `docker-compose.yml` file:
+
+```yaml
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: stock_portfolio_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+Start the services:
+
+```bash
+docker-compose up -d
+```
 
 ## 📚 API Endpoints
 
@@ -180,7 +216,6 @@ pytest --cov=.
 
 ```
 stock_portfolio_tracker_fastapi/
-├── alembic/                 # Database migrations
 ├── database/               # Database models and configuration
 │   ├── models.py          # SQLAlchemy models
 │   └── database.py        # Database connection
@@ -191,13 +226,14 @@ stock_portfolio_tracker_fastapi/
 ├── security.py           # Authentication and security
 ├── redis_client.py       # Redis connection and utilities
 ├── main.py              # FastAPI application entry point
+├── docker-compose.yml   # Docker services configuration
 ├── pyproject.toml       # Project dependencies and metadata
 └── README.md            # This file
 ```
 
 ### Adding New Features
 
-1. **Database Changes**: Update models in `database/models.py` and create migrations
+1. **Database Changes**: Update models in `database/models.py` (manual schema changes for now)
 2. **API Endpoints**: Add new routes in the appropriate router file
 3. **Validation**: Update schemas in `schemas.py` for new data models
 4. **Authentication**: Use the existing OAuth2 system for protected endpoints
