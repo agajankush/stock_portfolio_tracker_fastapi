@@ -5,6 +5,25 @@
 .env.test
 .env.production
 .env.staging
+.env.*.local
+
+# FastAPI specific
+*.db
+*.sqlite
+*.sqlite3
+
+# Database migrations (keep structure but ignore generated files)
+alembic/versions/*.py
+!alembic/versions/.gitkeep
+
+# Redis
+dump.rdb
+*.rdb
+
+# Application logs
+logs/
+fastapi.log
+uvicorn.log
 
 # Python
 __pycache__/
@@ -145,11 +164,6 @@ cython_debug/
 .vscode/
 
 # FastAPI specific
-*.db
-*.sqlite
-*.sqlite3
-
-# Database
 *.db
 *.sqlite
 *.sqlite3

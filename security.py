@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 import dotenv
 
 dotenv.load_dotenv()
@@ -17,6 +19,11 @@ import os
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 JWT_EXPIRATION_TIME = os.getenv("JWT_EXPIRATION_TIME")
+
+# --- OAuth2 Setup ---
+
+# OAuth2 scheme for token authentication
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 # --- Password Hashing Setup ---
 
@@ -48,3 +55,16 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+def verify_token(token: str, credentials_exception: HTTPException):
+    """
+    Verifies a JWT token and returns the token data.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+        return payload
+    except JWTError:
+        raise credentials_exception
