@@ -8,6 +8,7 @@ import database.models as models
 import security
 from database.database import get_db
 from redis_client import redis_client
+from celery_worker import generate_portfolio_report
 
 
 router = APIRouter(
@@ -45,3 +46,8 @@ def stock_price(symbol: str):
     
     redis_client.setex(symbol, 60, str(mock_price))
     return {"symbol": symbol, "price": mock_price, "source": "api"}
+
+@router.post("/{portfolio_id}/report", status_code=status.HTTP_202_ACCEPTED)
+def create_portfolio_report(portfolio_id: int):
+    generate_portfolio_report.delay(portfolio_id, "user@example.com")
+    return {"message": "Report generation started"}
