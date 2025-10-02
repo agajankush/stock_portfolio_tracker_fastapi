@@ -6,9 +6,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from contextlib import asynccontextmanager
 import asyncio
 import random
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from limiter_config import limiter
 
 setup_logging()
 
@@ -21,8 +21,6 @@ setup_logging()
 #     print("Application shutting down...")
 #     task.cancel()
 #     await task
-
-limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(
     title="Stock Portfolio API",
     description="An API to manage user stock portfolios in real-time.",

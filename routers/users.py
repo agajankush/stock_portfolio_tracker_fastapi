@@ -8,7 +8,7 @@ import schemas
 import security
 from database.database import engine, get_db
 import crud
-from main import limiter
+from limiter_config import limiter
 
 logger = logging.getLogger(__name__)
 
