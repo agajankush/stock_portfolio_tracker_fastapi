@@ -8,6 +8,7 @@ import schemas
 import security
 from database.database import engine, get_db
 import crud
+from main import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/token", response_model=schemas.Token)
+@limiter.limit("5/minute")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
