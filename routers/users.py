@@ -1,6 +1,6 @@
 import logging
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import database.models as models
@@ -31,7 +31,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @router.post("/token", response_model=schemas.Token)
 @limiter.limit("5/minute")
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.email == form_data.username).first()
     logger.info("User logged in", extra={"email": form_data.username})
